@@ -1,5 +1,4 @@
 #include <device/transform.cuh>
-#include <transformTypes.cuh>
 
 namespace pl
 {
@@ -23,7 +22,6 @@ namespace pl
 		}
 	}
 
-	template<>
 	__device__ thrust::pair<complex, complex> transform (
 		const thrust::complex<double> s,
 		TrapeziaData data)

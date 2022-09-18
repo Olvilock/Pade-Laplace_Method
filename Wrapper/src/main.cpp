@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 
-#include <plSolver.h>
+#include <pade_laplace.h>
 #include <spline.h>
 
 int main(int argc, char* argv[])
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "Dataset size is " << data.size() << '\n';
 	std::cout << std::fixed << std::setprecision(6);
-	pl::solveBatched<pl::transformType::Trapezia>(data, 64);
+	multiexp_trapezia(data, 64);
 
 	std::system("pause");
 }

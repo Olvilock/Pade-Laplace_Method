@@ -28,6 +28,5 @@ namespace pl
 		Trapezia, Spline
 	};
 
-	template <transformType>
-	Multiexp solveBatched(const dataset_type& data, unsigned depth);
+	Multiexp multiexp_trapezia(const dataset_type& data, unsigned depth);
 }

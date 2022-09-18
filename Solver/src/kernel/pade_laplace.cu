@@ -1,39 +1,27 @@
-#include <kernel/batchedSolver.cuh>
+#include <kernel/pade_laplace.cuh>
 
 #include <device/polyroot.cuh>
 #include <device/pl_slae.cuh>
 #include <device/residue.cuh>
-
 #include <device/transform.cuh>
-#include <transformTypes.cuh>
 
 namespace pl
 {
 	using complex = thrust::complex<double>;
 	
 	__device__
-		const batchedStatus& operator |= (
-			batchedStatus& me, const batchedStatus& other)
+		const Status& operator |= (
+			Status& me, const Status& other)
 	{
-		me = static_cast<batchedStatus>(
+		me = static_cast<Status>(
 			static_cast<int>(me) | static_cast<int>(other));
 		return me;
 	}
 	
-	template __global__ void kernelBatchedVecSolver(
+	__global__ void ker_pade_laplace(
 		const complex* grid,
 		batchedResult* result_grid,
-		TrapeziaData);
-	template __global__ void kernelBatchedVecSolver(
-		const complex* grid,
-		batchedResult* result_grid,
-		SplineData);
-
-	template <typename Arg>
-	__global__ void kernelBatchedVecSolver(
-		const complex* grid,
-		batchedResult* result_grid,
-		Arg arg)
+		TrapeziaData arg)
 	{
 		extern __shared__ complex roots[];
 		auto coeff = roots + blockDim.x;
@@ -51,11 +39,11 @@ namespace pl
 			blockIdx.x * blockDim.x * (blockDim.x + 1) / 2;
 		for (int lc_dim = 1; lc_dim <= blockDim.x; out_ptr += lc_dim++)
 		{
-			batchedStatus status = batchedStatus::ok;
+			Status status = Status::ok;
 			__syncthreads();
 
 			if (!(pl_slae_cg(lc_dim, 1000) < 1e-6))
-				status |= batchedStatus::degenerate_system;
+				status |= Status::degenerate_system;
 
 			auto this_coeff = taylor[threadIdx.x];
 			if (threadIdx.x < lc_dim && threadIdx.x)
@@ -78,7 +66,7 @@ namespace pl
 			auto highest_coeff = coeff[threadIdx.x];
 			
 			if (!(solveAberth(lc_dim, 100) < 1e-6))
-				status |= batchedStatus::Aberth_divergence;
+				status |= Status::Aberth_divergence;
 
 			if (threadIdx.x == lc_dim - 1)
 				coeff[0] = highest_coeff;

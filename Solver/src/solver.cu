@@ -1,8 +1,7 @@
-#include <plSolver.h>
-#include <kernel/batchedSolver.cuh>
+#include <pade_laplace.h>
+#include <kernel/pade_laplace.cuh>
 
 #include <device/transform.cuh>
-#include <transformTypes.cuh>
 #include <spline.h>
 
 #include <thrust/host_vector.h>
@@ -29,15 +28,13 @@ namespace pl
 
 	using complex = thrust::complex<double>;
 
-	int operator & (batchedStatus a, batchedStatus b)
+	int operator & (Status a, Status b)
 	{
 		return static_cast<int>(a) &
 			   static_cast<int>(b);
 	}
 
-	template <>
-	[[nodiscard]] Multiexp solveBatched<transformType::Trapezia> (
-		const dataset_type& h_data, unsigned depth)
+	Multiexp multiexp_trapezia (const dataset_type& h_data, unsigned depth)
 	{
 		thrust::device_vector<DeviceNode> d_data = h_data;
 		auto less_point =
@@ -55,13 +52,13 @@ namespace pl
 		
 		thrust::device_vector<batchedResult> d_result(
 			d_grid.size() * depth * (depth + 1) / 2,
-			{ {}, batchedStatus::untouched });
+			{ {}, Status::untouched });
 		
 		cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 		cudaCheckErrors("Device error\n");
 		std::cout << "Kernel launch...\n";
 		
-		kernelBatchedVecSolver
+		ker_pade_laplace
 		<<< d_grid.size(), depth, 4 * depth * sizeof(complex) >>>
 			(d_grid.data().get(), d_result.data().get(),
 				TrapeziaData{ d_data.data().get(), (int)d_data.size() });
@@ -83,13 +80,13 @@ namespace pl
 				auto cur_it = res_it;
 				for (int id = 0; id < count; id++, cur_it++)
 				{
-					if ((*cur_it).status & batchedStatus::degenerate_system)
+					if ((*cur_it).status & Status::degenerate_system)
 						std::cout << "(degenerate)";
-					if ((*cur_it).status & batchedStatus::Aberth_divergence)
+					if ((*cur_it).status & Status::Aberth_divergence)
 						std::cout << "(divergence)";
-					if ((*cur_it).status & batchedStatus::untouched)
+					if ((*cur_it).status & Status::untouched)
 						std::cout << "(untouched)";
-					if ((*cur_it).status == batchedStatus::ok)
+					if ((*cur_it).status == Status::ok)
 						std::cout << "(ok)";
 					
 					auto data = (*cur_it).data;

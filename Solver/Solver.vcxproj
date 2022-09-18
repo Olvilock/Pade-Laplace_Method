@@ -15,10 +15,9 @@
     <ClInclude Include="headers\device\polyroot.cuh" />
     <ClInclude Include="headers\device\residue.cuh" />
     <ClInclude Include="headers\device\transform.cuh" />
-    <ClInclude Include="headers\kernel\batchedSolver.cuh" />
-    <ClInclude Include="headers\plSolver.h" />
+    <ClInclude Include="headers\kernel\pade_laplace.cuh" />
+    <ClInclude Include="headers\pade_laplace.h" />
     <ClInclude Include="headers\spline.h" />
-    <ClInclude Include="headers\transformTypes.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\spline.cpp" />
@@ -30,7 +29,7 @@
     <CudaCompile Include="src\device\residue.cu" />
     <CudaCompile Include="src\device\transformSplines.cu" />
     <CudaCompile Include="src\device\transformTrapezia.cu" />
-    <CudaCompile Include="src\kernel\batchedSolver.cu" />
+    <CudaCompile Include="src\kernel\pade_laplace.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1BE38A13-3D45-42F4-B5AE-4BEAFD787D6F}</ProjectGuid>

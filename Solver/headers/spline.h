@@ -1,6 +1,6 @@
 #pragma once
 
-#include "plSolver.h"
+#include "pade_laplace.h"
 #include <vector>
 
 namespace pl

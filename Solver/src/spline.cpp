@@ -1,5 +1,5 @@
 #include <spline.h>
-#include <plSolver.h>
+#include <pade_laplace.h>
 
 #include <complex>
 #include <array>
